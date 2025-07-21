@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MobileNet V2 and the Mobile AI Revolution</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            color: #2c3e50;
+            padding: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.3)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.2)"/><circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.4)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.2)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 3.2em;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            margin: 20px 0 0 0;
+            font-size: 1.4em;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .revolution-banner {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+        
+        .architecture {
+            padding: 60px 30px;
+        }
+        
+        .architecture h2 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 40px;
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 50px;
+        }
+        
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .block:hover {
+            transform: translateY(-15px);
+        }
+        
+        .block-box {
+            padding: 25px;
+            border-radius: 18px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            min-width: 130px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .block-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .block-box:hover::before {
+            left: 100%;
+        }
+        
+        .block-box:hover {
+            transform: scale(1.08);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .input { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+        .conv-stem { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+        .bottleneck { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+        .bottleneck-ds { background: linear-gradient(135deg, #ff9a9e, #fad0c4); }
+        .conv-final { background: linear-gradient(135deg, #d299c2, #fef9d7); }
+        .pooling { background: linear-gradient(135deg, #89f7fe, #66a6ff); }
+        .classifier { background: linear-gradient(135deg, #667eea, #764ba2); }
+        
+        .arrow {
+            font-size: 2.5em;
+            color: #667eea;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+        }
+        
+        .block-info {
+            margin-top: 20px;
+            color: #2c3e50;
+            text-align: center;
+            max-width: 160px;
+        }
+        
+        .block-info h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.1em;
+            color: #34495e;
+        }
+        
+        .block-info p {
+            margin: 3px 0;
+            font-size: 0.85em;
+            opacity: 0.8;
+            line-height: 1.3;
+        }
+        
+        .repetition-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        
+        .dimensions {
+            font-size: 0.75em;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+        
+        .depthwise-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 60px 50px;
+            color: white;
+        }
+        
+        .depthwise-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .depthwise-intro {
+            text-align: center;
+            font-size: 1.2em;
+            max-width: 900px;
+            margin: 0 auto 50px;
+            line-height: 1.8;
+        }
+        
+        .convolution-comparison {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 40px;
+            align-items: center;
+            margin: 50px 0;
+        }
+        
+        .conv-type {
+            background: rgba(255,255,255,0.15);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .conv-type h3 {
+            margin: 0 0 20px 0;
+            font-size: 1.5em;
+        }
+        
+        .conv-visualization {
+            width: 200px;
+            height: 150px;
+            margin: 20px auto;
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .traditional-conv {
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255,255,255,0.2),
+                rgba(255,255,255,0.2) 5px,
+                rgba(255,255,255,0.1) 5px,
+                rgba(255,255,255,0.1) 10px
+            );
+        }
+        
+        .depthwise-conv {
+            background: linear-gradient(
+                to right,
+                rgba(255,99,132,0.3) 33%,
+                rgba(54,162,235,0.3) 33% 66%,
+                rgba(255,206,86,0.3) 66%
+            );
+        }
+        
+        .computation-formula {
+            font-family: 'Courier New', monospace;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .efficiency-metrics {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .metric {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 120px;
+            margin: 10px;
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .vs-symbol {
+            font-size: 3em;
+            font-weight: bold;
+            color: rgba(255,255,255,0.8);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .linear-bottleneck-section {
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+            padding: 60px 50px;
+            color: white;
+        }
+        
+        .bottleneck-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .bottleneck-intro {
+            text-align: center;
+            font-size: 1.2em;
+            max-width: 900px;
+            margin: 0 auto 50px;
+            line-height: 1.8;
+        }
+        
+        .bottleneck-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+        
+        .bottleneck-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 200px;
+        }
+        
+        .step-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .step-circle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3), transparent 50%);
+        }
+        
+        .step-circle:hover {
+            transform: scale(1.1) rotateY(15deg);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+        
+        .expand { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .depthwise { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .project { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        
+        .step-title {
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        
+        .step-detail {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+        
+        .step-description {
+            margin-top: 20px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .step-description h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .step-description p {
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .activation-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 50px 0;
+        }
+        
+        .activation-card {
+            background: rgba(255,255,255,0.15);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .activation-graph {
+            width: 150px;
+            height: 100px;
+            margin: 20px auto;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .relu-curve {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 130px;
+            height: 80px;
+            background: linear-gradient(to right, transparent 50%, #4ecdc4 50%);
+            clip-path: polygon(0 100%, 50% 100%, 50% 0, 100% 0, 100% 100%);
+        }
+        
+        .linear-line {
+            position: absolute;
+            bottom: 50px;
+            left: 10px;
+            width: 130px;
+            height: 2px;
+            background: #4ecdc4;
+        }
+        
+        .stats-section {
+            background: #f8f9fa;
+            padding: 60px 50px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .stat1 { border-top-color: #3498db; }
+        .stat2 { border-top-color: #e74c3c; }
+        .stat3 { border-top-color: #2ecc71; }
+        .stat4 { border-top-color: #f39c12; }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat1 .stat-number { color: #3498db; }
+        .stat2 .stat-number { color: #e74c3c; }
+        .stat3 .stat-number { color: #2ecc71; }
+        .stat4 .stat-number { color: #f39c12; }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .impact-section {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 60px 50px;
+            text-align: center;
+        }
+        
+        .impact-title {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .impact-card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .impact-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        
+        .impact-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+        }
+        
+        @media (max-width: 1200px) {
+            .flow-row {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .convolution-comparison {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .vs-symbol {
+                transform: rotate(90deg);
+                margin: 20px 0;
+            }
+            
+            .bottleneck-flow {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px;
+            }
+            
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .depthwise-section, .linear-bottleneck-section {
+                padding: 40px 20px;
+            }
+            
+            .flow-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            
+            .block-box {
+                min-width: 110px;
+                min-height: 90px;
+                padding: 20px;
+            }
+            
+            .activation-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MobileNet V2</h1>
+            <p>Revolutionizing AI for Mobile Devices</p>
+        </div>
+        
+        <div class="revolution-banner">
+            🚀 The breakthrough that made real-time AI possible on smartphones and edge devices
+        </div>
+        
+        <div class="architecture">
+            <h2>MobileNet V2 Architecture</h2>
+            <div class="flow-container">
+                <!-- First Row -->
+                <div class="flow-row">
+                    <div class="block">
+                        <div class="block-box input">
+                            <div>Input</div>
+                            <div class="dimensions">224×224×3</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Input Layer</h3>
+                            <p>RGB Image</p>
+                            <p>Standard resolution</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box conv-stem">
+                            <div>Conv2D</div>
+                            <div class="dimensions">112×112×32</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Stem Conv</h3>
+                            <p>3×3, stride=2</p>
+                            <p>Initial features</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box bottleneck">
+                            <div class="repetition-indicator">1</div>
+                            <div>Bottleneck</div>
+                            <div class="dimensions">112×112×16</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Linear Bottleneck</h3>
+                            <p>t=1, no expansion</p>
+                            <p>112×112×16</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box bottleneck-ds">
+                            <div class="repetition-indicator">2</div>
+                            <div>Bottleneck</div>
+                            <div class="dimensions">56×56×24</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Inverted Residual</h3>
+                            <p>t=6, stride=2</p>
+                            <p>2 blocks</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box bottleneck">
+                            <div class="repetition-indicator">3</div>
+                            <div>Bottleneck</div>
+                            <div class="dimensions">28×28×32</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Inverted Residual</h3>
+                            <p>t=6, stride=2</p>
+                            <p>3 blocks</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Connecting Arrow -->
+                <div class="arrow" style="font-size: 3em; transform: rotate(90deg);">↓</div>
+                
+                <!-- Second Row -->
+                <div class="flow-row">
+                    <div class="block">
+                        <div class="block-box bottleneck-ds">
+                            <div class="repetition-indicator">4</div>
+                            <div>Bottleneck</div>
+                            <div class="dimensions">14×14×64</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Inverted Residual</h3>
+                            <p>t=6, stride=2</p>
+                            <p>4 blocks</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box bottleneck">
+                            <div class="repetition-indicator">3</div>
+                            <div>Bottleneck</div>
+                            <div class="dimensions">14×14×96</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Inverted Residual</h3>
+                            <p>t=6, stride=1</p>
+                            <p>3 blocks</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box bottleneck-ds">
+                            <div class="repetition-indicator">3</div>
+                            <div>Bottleneck</div>
+                            <div class="dimensions">7×7×160</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Inverted Residual</h3>
+                            <p>t=6, stride=2</p>
+                            <p>3 blocks</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box bottleneck">
+                            <div class="repetition-indicator">1</div>
+                            <div>Bottleneck</div>
+                            <div class="dimensions">7×7×320</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Final Bottleneck</h3>
+                            <p>t=6, stride=1</p>
+                            <p>Highest channels</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box conv-final">
+                            <div>Conv2D</div>
+                            <div class="dimensions">7×7×1280</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Final Conv</h3>
+                            <p>1×1 convolution</p>
+                            <p>Feature expansion</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box pooling">
+                            <div>Avg Pool</div>
+                            <div class="dimensions">1×1×1280</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Global Pool</h3>
+                            <p>7×7 → 1×1</p>
+                            <p>Spatial reduction</p>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow">→</div>
+                    
+                    <div class="block">
+                        <div class="block-box classifier">
+                            <div>Classifier</div>
+                            <div class="dimensions">1000</div>
+                        </div>
+                        <div class="block-info">
+                            <h3>Classification</h3>
+                            <p>Fully connected</p>
+                            <p>1000 classes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Depthwise Separable Convolution Section -->
+        <div class="depthwise-section">
+            <h2 class="depthwise-title">Revolutionary Breakthrough of Depthwise Separable Convolution</h2>
+            <p class="depthwise-intro">
+                The core innovation of MobileNet V2 lies in <strong>depthwise separable convolution</strong> - 
+                a brilliant technique that separates spatial and channel-wise computations, 
+                achieving dramatic efficiency gains while maintaining representational power.
+            </p>
+            
+            <div class="convolution-comparison">
+                <div class="conv-type">
+                    <h3>Traditional Convolution</h3>
+                    <div class="conv-visualization traditional-conv">
+                        <div style="color: white; font-weight: bold;">Spatial + Channel</div>
+                    </div>
+                    <div class="computation-formula">
+                        H × W × C_in × C_out × K²
+                    </div>
+                    <p>Processes spatial and channel dimensions simultaneously in a single operation</p>
+                </div>
+                
+                <div class="vs-symbol">VS</div>
+                
+                <div class="conv-type">
+                    <h3>Depthwise Separable</h3>
+                    <div class="conv-visualization depthwise-conv">
+                        <div style="color: white; font-weight: bold; font-size: 0.8em;">Spatial | Channel</div>
+                    </div>
+                    <div class="computation-formula">
+                        H × W × C_in × K² + H × W × C_in × C_out
+                    </div>
+                    <p>Separates spatial filtering and channel mixing into two distinct steps</p>
+                </div>
+            </div>
+            
+            <div class="efficiency-metrics">
+                <div class="metric">
+                    <div class="metric-value">8-9×</div>
+                    <div>Computation Reduction</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">90%</div>
+                    <div>Parameter Reduction</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">2-4×</div>
+                    <div>Speed Improvement</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">75%</div>
+                    <div>Memory Savings</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Linear Bottleneck Section -->
+        <div class="linear-bottleneck-section">
+            <h2 class="bottleneck-title">Subtle Balance of Linear Bottleneck</h2>
+            <p class="bottleneck-intro">
+                MobileNet V2 introduces the <strong>inverted residual with linear bottleneck</strong> - 
+                a counterintuitive design that expands before contracting, 
+                and crucially uses linear activation in the final layer to preserve information flow.
+            </p>
+            
+            <div class="bottleneck-flow">
+                <div class="bottleneck-step">
+                    <div class="step-circle expand">
+                        <div class="step-title">Expand</div>
+                        <div class="step-detail">1×1 Conv + ReLU6</div>
+                    </div>
+                    <div class="step-description">
+                        <h4>Dimension Expansion</h4>
+                        <p>Expand channels by factor t (typically 6) to provide rich representation space for spatial processing</p>
+                    </div>
+                </div>
+                
+                <div class="arrow">→</div>
+                
+                <div class="bottleneck-step">
+                    <div class="step-circle depthwise">
+                        <div class="step-title">Depthwise</div>
+                        <div class="step-detail">3×3 DW + ReLU6</div>
+                    </div>
+                    <div class="step-description">
+                        <h4>Spatial Filtering</h4>
+                        <p>Process spatial information efficiently using depthwise convolution on expanded feature maps</p>
+                    </div>
+                </div>
+                
+                <div class="arrow">→</div>
+                
+                <div class="bottleneck-step">
+                    <div class="step-circle project">
+                        <div class="step-title">Project</div>
+                        <div class="step-detail">1×1 Conv + Linear</div>
+                    </div>
+                    <div class="step-description">
+                        <h4>Linear Projection</h4>
+                        <p>Project to low-dimensional space using LINEAR activation to preserve manifold structure</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="activation-comparison">
+                <div class="activation-card">
+                    <h3>Traditional: ReLU Bottleneck</h3>
+                    <div class="activation-graph">
+                        <div class="relu-curve"></div>
+                    </div>
+                    <p><strong>Problem:</strong> ReLU destroys information in low-dimensional bottlenecks due to non-reversible transformations</p>
+                </div>
+                
+                <div class="activation-card">
+                    <h3>MobileNet V2: Linear Bottleneck</h3>
+                    <div class="activation-graph">
+                        <div class="linear-line"></div>
+                    </div>
+                    <p><strong>Solution:</strong> Linear activation preserves information flow and enables effective residual connections</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Section -->
+        <div class="stats-section">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Impact & Performance</h2>
+            <div class="stats-grid">
+                <div class="stat-card stat1">
+                    <div class="stat-number">3.4M</div>
+                    <div class="stat-label">Parameters</div>
+                    <p style="margin-top: 10px; color: #7f8c8d;">Extremely lightweight for mobile deployment</p>
+                </div>
+                
+                <div class="stat-card stat2">
+                    <div class="stat-number">72.0%</div>
+                    <div class="stat-label">ImageNet Top-1</div>
+                    <p style="margin-top: 10px; color: #7f8c8d;">Strong accuracy despite efficiency focus</p>
+                </div>
+                
+                <div class="stat-card stat3">
+                    <div class="stat-number">300M</div>
+                    <div class="stat-label">MAdds</div>
+                    <p style="margin-top: 10px; color: #7f8c8d;">Multiply-accumulate operations for inference</p>
+                </div>
+                
+                <div class="stat-card stat4">
+                    <div class="stat-number">17</div>
+                    <div class="stat-label">Bottleneck Blocks</div>
+                    <p style="margin-top: 10px; color: #7f8c8d;">Optimized depth for mobile efficiency</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Impact Section -->
+        <div class="impact-section">
+            <h2 class="impact-title">The Mobile AI Revolution</h2>
+            <p style="font-size: 1.2em; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                MobileNet V2 didn't just improve efficiency - it fundamentally changed what's possible on mobile devices, 
+                democratizing AI and enabling real-time applications previously thought impossible.
+            </p>
+            
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-icon">📱</div>
+                    <h3>Mobile-First AI</h3>
+                    <p>Enabled real-time computer vision on smartphones, from camera apps to augmented reality experiences</p>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-icon">🌐</div>
+                    <h3>Edge Computing</h3>
+                    <p>Brought AI inference to edge devices, reducing latency and enabling offline intelligent applications</p>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-icon">🚀</div>
+                    <h3>Efficiency Paradigm</h3>
+                    <p>Established efficiency-first design principles that influenced countless subsequent architectures</p>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-icon">🔬</div>
+                    <h3>Research Foundation</h3>
+                    <p>Provided the building blocks for EfficientNet, MobileNet V3, and modern neural architecture search</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Animate blocks
+        document.querySelectorAll('.block').forEach((block, index) => {
+            block.style.opacity = '0';
+            block.style.transform = 'translateY(30px)';
+            block.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            observer.observe(block);
+        });
+        
+        // Animate stat cards
+        document.querySelectorAll('.stat-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease ${index * 0.2}s`;
+            observer.observe(card);
+        });
+        
+        // Interactive bottleneck steps
+        document.querySelectorAll('.step-circle').forEach(step => {
+            step.addEventListener('click', function() {
+                // Remove active class from all steps
+                document.querySelectorAll('.step-circle').forEach(s => s.classList.remove('active-step'));
+                
+                // Add active class to clicked step
+                this.classList.add('active-step');
+                
+                // Add animation effect
+                this.style.transform = 'scale(1.2) rotateY(20deg)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.1) rotateY(15deg)';
+                }, 300);
+            });
+        });
+        
+        // Add CSS for active step
+        const style = document.createElement('style');
+        style.textContent = `
+            .active-step {
+                box-shadow: 0 30px 60px rgba(0,0,0,0.5) !important;
+                border: 3px solid rgba(255,255,255,0.8) !important;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Animate efficiency metrics on scroll
+        const metricsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const metrics = entry.target.querySelectorAll('.metric');
+                    metrics.forEach((metric, index) => {
+                        setTimeout(() => {
+                            metric.style.opacity = '1';
+                            metric.style.transform = 'translateY(0) scale(1)';
+                        }, index * 200);
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+        
+        const metricsSection = document.querySelector('.efficiency-metrics');
+        if (metricsSection) {
+            // Initialize metrics as hidden
+            metricsSection.querySelectorAll('.metric').forEach(metric => {
+                metric.style.opacity = '0';
+                metric.style.transform = 'translateY(20px) scale(0.9)';
+                metric.style.transition = 'all 0.6s ease';
+            });
+            
+            metricsObserver.observe(metricsSection);
+        }
+        
+        // Add hover effects for blocks
+        document.querySelectorAll('.block-box').forEach(block => {
+            block.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.08) translateZ(10px)';
+            });
+            
+            block.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) translateZ(0px)';
+            });
+        });
+        
+        // Animate impact cards
+        document.querySelectorAll('.impact-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease ${index * 0.15}s`;
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
